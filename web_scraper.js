@@ -38,105 +38,136 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 Object.defineProperty(exports, "__esModule", { value: true });
 var selenium_webdriver_1 = require("selenium-webdriver");
 var mainUrl = 'https://www.qemu.org/';
-function discoverWebsiteStructure(url_1) {
-    return __awaiter(this, arguments, void 0, function (url, visited) {
-        function explorePage(pageUrl) {
-            return __awaiter(this, void 0, void 0, function () {
-                var links, pageLinks, _i, links_1, link, href, _a, pageLinks_1, link;
-                return __generator(this, function (_b) {
-                    switch (_b.label) {
-                        case 0:
-                            if (visited.has(pageUrl))
-                                return [2 /*return*/];
-                            visited.add(pageUrl);
-                            return [4 /*yield*/, driver.get(pageUrl)];
-                        case 1:
-                            _b.sent();
-                            return [4 /*yield*/, driver.findElements(selenium_webdriver_1.By.tagName('a'))];
-                        case 2:
-                            links = _b.sent();
-                            pageLinks = [];
-                            _i = 0, links_1 = links;
-                            _b.label = 3;
-                        case 3:
-                            if (!(_i < links_1.length)) return [3 /*break*/, 6];
-                            link = links_1[_i];
-                            return [4 /*yield*/, link.getAttribute('href')];
-                        case 4:
-                            href = _b.sent();
-                            //if (href && href.startsWith(url) && !visited.has(href)) {
-                            pageLinks.push(href);
-                            _b.label = 5;
-                        case 5:
-                            _i++;
-                            return [3 /*break*/, 3];
-                        case 6:
-                            structure.set(pageUrl, pageLinks);
-                            _a = 0, pageLinks_1 = pageLinks;
-                            _b.label = 7;
-                        case 7:
-                            if (!(_a < pageLinks_1.length)) return [3 /*break*/, 10];
-                            link = pageLinks_1[_a];
-                            return [4 /*yield*/, explorePage(link)];
-                        case 8:
-                            _b.sent();
-                            _b.label = 9;
-                        case 9:
-                            _a++;
-                            return [3 /*break*/, 7];
-                        case 10: return [2 /*return*/];
-                    }
-                });
-            });
-        }
-        var driver, structure;
-        if (visited === void 0) { visited = new Set(); }
+function discoverWebsiteStructure(url) {
+    return __awaiter(this, void 0, void 0, function () {
+        var driver, links, pageLinks, _i, links_1, link, href;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, new selenium_webdriver_1.Builder().forBrowser('chrome').build()];
                 case 1:
                     driver = _a.sent();
-                    structure = new Map();
                     _a.label = 2;
                 case 2:
-                    _a.trys.push([2, , 4, 6]);
-                    return [4 /*yield*/, explorePage(url)];
+                    _a.trys.push([2, , 9, 11]);
+                    return [4 /*yield*/, driver.get(url)];
                 case 3:
                     _a.sent();
-                    return [3 /*break*/, 6];
-                case 4: return [4 /*yield*/, driver.quit()];
+                    return [4 /*yield*/, driver.findElements(selenium_webdriver_1.By.tagName('a'))];
+                case 4:
+                    links = _a.sent();
+                    pageLinks = [];
+                    _i = 0, links_1 = links;
+                    _a.label = 5;
                 case 5:
+                    if (!(_i < links_1.length)) return [3 /*break*/, 8];
+                    link = links_1[_i];
+                    return [4 /*yield*/, link.getAttribute('href')];
+                case 6:
+                    href = _a.sent();
+                    //after we commented it endlesly downloading some stuff
+                    if (href && href.startsWith(url)) {
+                        pageLinks.push(href);
+                    }
+                    _a.label = 7;
+                case 7:
+                    _i++;
+                    return [3 /*break*/, 5];
+                case 8: return [2 /*return*/, pageLinks];
+                case 9: return [4 /*yield*/, driver.quit()];
+                case 10:
                     _a.sent();
                     return [7 /*endfinally*/];
-                case 6: return [2 /*return*/, structure];
+                case 11: return [2 /*return*/];
             }
         });
     });
 }
-function composeInterconnectionMatrix(structure) {
-    var pages = Array.from(structure.keys());
-    var matrix = [];
-    for (var _i = 0, pages_1 = pages; _i < pages_1.length; _i++) {
-        var page1 = pages_1[_i];
-        var row = [];
-        var links = structure.get(page1) || [];
-        for (var _a = 0, pages_2 = pages; _a < pages_2.length; _a++) {
-            var page2 = pages_2[_a];
-            if (page1 === page2) {
-                row.push('N/A');
+function isPageConnected(driver, fromPage, toPage) {
+    return __awaiter(this, void 0, void 0, function () {
+        var links, _i, links_2, link, href;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, driver.get(fromPage)];
+                case 1:
+                    _a.sent();
+                    return [4 /*yield*/, driver.findElements(selenium_webdriver_1.By.tagName('a'))];
+                case 2:
+                    links = _a.sent();
+                    _i = 0, links_2 = links;
+                    _a.label = 3;
+                case 3:
+                    if (!(_i < links_2.length)) return [3 /*break*/, 6];
+                    link = links_2[_i];
+                    return [4 /*yield*/, link.getAttribute('href')];
+                case 4:
+                    href = _a.sent();
+                    if (href === toPage) {
+                        return [2 /*return*/, true];
+                    }
+                    _a.label = 5;
+                case 5:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 6: return [2 /*return*/, false];
             }
-            else {
-                row.push(links.includes(page2) ? 'Y' : 'N');
-            }
-        }
-        matrix.push(row);
-    }
-    return matrix;
+        });
+    });
 }
-discoverWebsiteStructure(mainUrl).then(function (structure) {
-    var pages = Array.from(structure.keys());
+function composeInterconnectionMatrix(pages) {
+    return __awaiter(this, void 0, void 0, function () {
+        var matrix, driver, _i, pages_1, page1, row, _a, pages_2, page2, isConnected;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    matrix = [];
+                    return [4 /*yield*/, new selenium_webdriver_1.Builder().forBrowser('chrome').build()];
+                case 1:
+                    driver = _b.sent();
+                    _b.label = 2;
+                case 2:
+                    _b.trys.push([2, , 11, 13]);
+                    _i = 0, pages_1 = pages;
+                    _b.label = 3;
+                case 3:
+                    if (!(_i < pages_1.length)) return [3 /*break*/, 10];
+                    page1 = pages_1[_i];
+                    row = [];
+                    _a = 0, pages_2 = pages;
+                    _b.label = 4;
+                case 4:
+                    if (!(_a < pages_2.length)) return [3 /*break*/, 8];
+                    page2 = pages_2[_a];
+                    if (!(page1 === page2)) return [3 /*break*/, 5];
+                    row.push('N/A');
+                    return [3 /*break*/, 7];
+                case 5: return [4 /*yield*/, isPageConnected(driver, page1, page2)];
+                case 6:
+                    isConnected = _b.sent();
+                    row.push(isConnected ? 'Y' : 'N');
+                    _b.label = 7;
+                case 7:
+                    _a++;
+                    return [3 /*break*/, 4];
+                case 8:
+                    matrix.push(row);
+                    _b.label = 9;
+                case 9:
+                    _i++;
+                    return [3 /*break*/, 3];
+                case 10: return [2 /*return*/, matrix];
+                case 11: return [4 /*yield*/, driver.quit()];
+                case 12:
+                    _b.sent();
+                    return [7 /*endfinally*/];
+                case 13: return [2 /*return*/];
+            }
+        });
+    });
+}
+discoverWebsiteStructure(mainUrl).then(function (pages) {
     console.log('Discovered pages:', pages);
-    var matrix = composeInterconnectionMatrix(structure);
-    console.log('Interconnection Matrix:');
-    console.table(matrix);
+    composeInterconnectionMatrix(pages).then(function (matrix) {
+        console.log('Interconnection Matrix:');
+        console.table(matrix);
+    });
 });

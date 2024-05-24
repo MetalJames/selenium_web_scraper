@@ -10,6 +10,7 @@ async function discoverWebsiteStructure(url: string): Promise<string[]> {
         const pageLinks: string[] = [];
         for (const link of links) {
             const href = await link.getAttribute('href');
+            //after we commented it endlesly downloading some stuff
             if (href && href.startsWith(url)) {
                 pageLinks.push(href);
             }
